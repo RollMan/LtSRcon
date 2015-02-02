@@ -1,5 +1,6 @@
 from rcon import ConnectionHandler
 from rcon import exceptions
+from socket import error
 import servercfg
 import onchatcommands
 
@@ -20,6 +21,9 @@ if __name__ == "__main__":
             print("Unable to connect")
         except exceptions.InvalidPassword as e:
             print("Wrong password")
+        except error as e:
+            print("Invalid server address or port number.")
+            print("Set the correct values at ip, pw and port variables on the lines 7-9 in main.py.")
         else:
             print("Successfully connected!")
             while True:
@@ -33,3 +37,5 @@ if __name__ == "__main__":
                     #print(event)
                     if(event[0] == "player.onChat"):
                         onchatcommands.sendcommand(event, server)
+        finally:
+            exit(0)
