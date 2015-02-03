@@ -49,30 +49,60 @@ modedic = {"cqL":"ConquestLarge0",
 
 def sendcommand(event, server):
     result = []
-    order = event[2]
+    option = []
+    order  = event[2].split()[0]
+    if " " in event[2]:
+        option = event[2].split()
+        del option[0]
     if order[0] != '!':
-        return "Not command"
+        return ["Not command"]
     elif order == "!rs":
         result.append(server.sndcmd("mapList.restartRound"))
-    elif order.split()[0] == "!chgmap":
-        result.append(server.sndcmd("mapList.clear"))
-        result.append(server.sndcmd("mapList.add", [mapdic[order.split()[1]], modedic[order.split()[2]], 1]))
-        result.append(server.sndcmd("mapList.runNextRound"))
-    elif(order.split()[0] == "!maplist":
-        maps = []
-        line = ""
-        for key in mapdic.iterkeys():
-            maps.append(key)
-        line.join(maps)
-        result.append(server.sndcmd("admin.say", [line, all]))
-    elif(order.split()[0] == "!modelist":
-        modes = []
-        line = ""
-        for key in modedic.iterkeys():
-            modes.append(key)
-        line.join(modes)
-        result.append(server.sndcmd("admin.say", [line, all]))
+    
+    elif order == "!help":
+        result.append(server.sndcmd("admin.say", ["!rs, !chgmap <map> <mode>, !mapList, !modeList", "all"]))
+    
+    elif order == "!chgmap":
+        if len(option) != 2:
+            result.append(server.sndcmd("admin.say", ["Usage: !chgmap <map> <mode>", "all"]))
+        elif option[0] not in mapdic or option[1] not in modedic:
+            result.append(server.sndcmd("admin.say", ["No such a map or mode.", "all"]))
+        else:
+            result.append(server.sndcmd("mapList.clear"))
+            result.append(server.sndcmd("mapList.add", [mapdic[option[0]], modedic[option[1]], 1]))
+            result.append(server.sndcmd("mapList.runNextRound"))
+        
+    elif(order == "!maplist"):
+        try:
+            line = ""
+            for key in mapdic:
+                if len(line) > 100:
+                    result.append(server.sndcmd("admin.say", [line, "all"]))
+                    line = ""
+                else:
+                    line += key + ","
+            result.append(server.sndcmd("admin.say", [line, "all"]))
+        
+        except Exception as e:
+            message = "ERROR: type:" + type(e) + " args:" + str(e.args)
+            result.append(message)
+
+    elif(order == "!modelist"):
+        try:
+            line = ""
+            for key in modedic:
+                if len(line) > 100:
+                    result.append(server.sndcmd("admin.say", [line, "all"]))
+                    line = ""
+                else:
+                    line += key + ","
+            result.append(server.sndcmd("admin.say", [line, "all"]))
+        
+        except Exception as e:
+            message = "ERROE: type:" + type(e) + "args:" + str(e.args)
+            result.append(message)
     else:
-        return "Command Error"
-  
+        result.append(server.sndcmd("admin.say", ["No such a command", "all"]))
+        return ["No such a command"]
+    
     return result
