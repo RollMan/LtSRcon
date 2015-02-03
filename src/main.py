@@ -3,11 +3,11 @@ from rcon import exceptions
 from socket import error
 import servercfg
 import onchatcommands
+import time
 
 ip = "YOUR.IP.ADD.RESS"
 pw = "YOUR_PASS"
 port = 12345
-
 
 if __name__ == "__main__":
     while True:
@@ -44,10 +44,12 @@ if __name__ == "__main__":
                     servercfg.logging("Reconnected!")
                     print("Reconnected!")
                 else:
-                    #print(event)
-                    if(event[0] == "player.onChat"):
+                    if event[1] == "Server":
+                        continue
+                    if event[0] == "player.onChat":
                         logs = onchatcommands.sendcommand(event, server)
                         for i in range(len(logs)):
                             if logs[i] is None:
                                 logs[i] = "None"
                         servercfg.logging("\n                        ".join(logs))
+                        time.sleep(1)

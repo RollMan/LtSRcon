@@ -56,23 +56,28 @@ def sendcommand(event, server):
         del option[0]
     if order[0] != '!':
         return ["Not command"]
+
     elif order == "!rs":
         result.append(server.sndcmd("mapList.restartRound"))
     
     elif order == "!help":
-        result.append(server.sndcmd("admin.say", ["!rs, !chgmap <map> <mode>, !mapList, !modeList", "all"]))
+        result.append(server.sndcmd("admin.say", ["!rs, !chgmap <map> <mode>, !maplist, !modelist", "all"]))
     
     elif order == "!chgmap":
-        if len(option) != 2:
-            result.append(server.sndcmd("admin.say", ["Usage: !chgmap <map> <mode>", "all"]))
-        elif option[0] not in mapdic or option[1] not in modedic:
-            result.append(server.sndcmd("admin.say", ["No such a map or mode.", "all"]))
-        else:
-            result.append(server.sndcmd("mapList.clear"))
-            result.append(server.sndcmd("mapList.add", [mapdic[option[0]], modedic[option[1]], 1]))
-            result.append(server.sndcmd("mapList.runNextRound"))
-        
-    elif(order == "!maplist"):
+        try:
+            if len(option) != 2:
+                result.append(server.sndcmd("admin.say", ["Usage: !chgmap <map> <mode>", "all"]))
+            elif option[0] not in mapdic or option[1] not in modedic:
+                result.append(server.sndcmd("admin.say", ["No such a map or mode.", "all"]))
+            else:
+                result.append(server.sndcmd("mapList.clear"))
+                result.append(server.sndcmd("mapList.add", [mapdic[option[0]], modedic[option[1]], 1]))
+                result.append(server.sndcmd("mapList.runNextRound"))
+        except Exception as e:
+            server.sndcmd("admin.say", ["Failed because of unknown problem.", "all"])
+            message = "ERROE: in !chgmap type:" + str(type(e)) + " args:" + str(e.args)
+            result.append(message)
+    elif order == "!maplist":
         try:
             line = ""
             for key in mapdic:
@@ -84,10 +89,11 @@ def sendcommand(event, server):
             result.append(server.sndcmd("admin.say", [line, "all"]))
         
         except Exception as e:
-            message = "ERROR: type:" + type(e) + " args:" + str(e.args)
+            server.sndcmd("admin.say", ["Failed", "all"])
+            message = "ERROR: type:" + str(type(e)) + " args:" + str(e.args)
             result.append(message)
 
-    elif(order == "!modelist"):
+    elif order == "!modelist":
         try:
             line = ""
             for key in modedic:
@@ -99,7 +105,8 @@ def sendcommand(event, server):
             result.append(server.sndcmd("admin.say", [line, "all"]))
         
         except Exception as e:
-            message = "ERROE: type:" + type(e) + "args:" + str(e.args)
+            server.sndcmd("admin.say", ["Failed", "all"])
+            message = "ERROE: type:" + str(type(e)) + "args:" + str(e.args)
             result.append(message)
     else:
         result.append(server.sndcmd("admin.say", ["No such a command", "all"]))
